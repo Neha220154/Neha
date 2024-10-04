@@ -1,0 +1,25 @@
+<?php
+session_start();
+
+// Initialize cart if not set
+if (!isset($_SESSION['cart'])) {
+    $_SESSION['cart'] = [];
+}
+
+// Handle form submission
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $product_id = $_POST['product_id'];
+    $quantity = intval($_POST['quantity']);
+
+    // Add to cart
+    if (isset($_SESSION['cart'][$product_id])) {
+        $_SESSION['cart'][$product_id] += $quantity; // Update quantity
+    } else {
+        $_SESSION['cart'][$product_id] = $quantity; // Add new item
+    }
+}
+
+// Redirect back to the product listing page
+header("Location: product_listing.php");
+exit;
+?>
