@@ -1,0 +1,78 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+}
+
+.dashboard-container {
+    max-width: 900px;
+    margin: 20px auto;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    padding: 20px;
+}
+
+header {
+    background: #28a728;
+    color: white;
+    padding: 20px;
+    text-align: center;
+    border-radius: 8px 8px 0 0;
+}
+
+.user-info {
+    padding: 20px;
+    border-bottom: 1px solid #ddd;
+}
+
+.user-info h2 {
+    margin-top: 0;
+}
+
+.action {
+    padding: 20px;
+}
+
+.action h2 {
+    margin-top: 0;
+}
+
+.action-items, .action-item {
+    background: #f8f8f8;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 15px;
+    margin: 10px 0;
+}
+
+.action-items h3, .action-item h3 {
+    margin: 0 0 10px 0;
+}
+
+.action-items p, .action-item p {
+    margin: 0 0 10px 0;
+}
+
+.action-items a, .action-item a {
+    display: inline-block;
+    padding: 10px 15px;
+    background: #28a728;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    transition: background 0.3s;
+}
+
+.action-items a:hover, .action-item a:hover {
+    background: #28a728;
+}
+
+footer {
+    text-align: center;
+    padding: 20px;
+    background: #f1f1f1;
+    margin-top: 20px;
+    border-radius: 0 0 8px 8px;
+}
