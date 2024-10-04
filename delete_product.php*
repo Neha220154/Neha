@@ -1,0 +1,147 @@
+<?php
+session_start();
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
+// Check if the user is logged in
+if (!isset($_SESSION['email'])) {
+    header("Location: login.php");
+    exit;
+}
+
+// Database connection
+$host = 'localhost';
+$db = 'agrishop';
+$user = 'root';
+$pass = '';
+
+$conn = new mysqli($host, $user, $pass, $db);
+
+// Check connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+// Initialize variables
+$successMessage = $errorMessage = "";
+
+// Check if product ID is set for deletion
+if (isset($_GET['id'])) {
+    $productId = intval($_GET['id']);
+
+    // Prepare and bind
+    $stmt = $conn->prepare("DELETE FROM product WHERE product_id = ?");
+    $stmt->bind_param("i", $productId);
+
+    // Execute statement
+    if ($stmt->execute()) {
+        $successMessage = "Product deleted successfully.";
+    } else {
+        $errorMessage = "Error deleting product: " . $stmt->error;
+    }
+
+    $stmt->close();
+}
+
+// Fetch products to display in table
+$result = $conn->query("SELECT product_id, product_name, description, price, quantity FROM product");
+
+if (!$result) {
+    $errorMessage = "Error fetching products: " . $conn->error;
+}
+
+$conn->close();
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delete Product</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .message {
+            text-align: center;
+            font-size: 14px;
+            margin: 10px 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        table, th, td {
+            border: 1px solid #ccc;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        a {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            text-decoration: none;
+            color: #007bff;
+            transition: color 0.3s;
+        }
+        a:hover {
+            color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h1>Delete Product</h1>
+
+    <?php if ($successMessage) { echo "<p class='message' style='color:green;'>$successMessage</p>"; } ?>
+    <?php if ($errorMessage) { echo "<p class='message' style='color:red;'>$errorMessage</p>"; } ?>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>Product ID</th>
+                <th>Product Name</th>
+                <th>Description</th>
+                <th>Price</th>
+                <th>Quantity</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php if ($result && $result->num_rows > 0): ?>
+                <?php while ($row = $result->fetch_assoc()): ?>
+                    <tr>
+                        <td><?php echo $row['product_id']; ?></td>
+                        <td><?php echo htmlspecialchars($row['product_name']); ?></td>
+                        <td><?php echo htmlspecialchars($row['description']); ?></td>
+                        <td><?php echo htmlspecialchars($row['price']); ?></td>
+                        <td><?php echo htmlspecialchars($row['quantity']); ?></td>
+                        <td>
+                            <a href="delete_product.php?id=<?php echo $row['product_id']; ?>" onclick="return confirm('Are you sure you want to delete this product?');">Delete</a>
+                        </td>
+                    </tr>
+                <?php endwhile; ?>
+            <?php else: ?>
+                <tr>
+                    <td colspan="6">No products found.</td>
+                </tr>
+            <?php endif; ?>
+        </tbody>
+    </table>
+
+    <a href="user-dashboard.php">Back to Dashboard</a>
+</body>
+</html>
