@@ -1,0 +1,73 @@
+<?php
+session_start();
+
+// Check if the user is logged in
+if (!isset($_SESSION['email'])) {
+    header("Location: login.php"); // Redirect to login if not logged in
+    exit;
+}
+
+// Database connection
+$host = 'localhost';
+$db = 'agrishop';
+$user = 'root';
+$pass = '';
+
+$conn = new mysqli($host, $user, $pass, $db);
+
+// Check connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+// Get user details
+$email = $_SESSION['email'];
+$stmt = $conn->prepare("SELECT name, role FROM users WHERE email = ?");
+$stmt->bind_param("s", $email);
+$stmt->execute();
+$stmt->bind_result($name, $role);
+$stmt->fetch();
+$stmt->close();
+
+// Update user information
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $new_name = $_POST['name'];
+    $stmt = $conn->prepare("UPDATE users SET name = ? WHERE email = ?");
+    $stmt->bind_param("ss", $new_name, $email);
+    $stmt->execute();
+    $stmt->close();
+
+    // Update the session variable
+    $_SESSION['name'] = $new_name;
+
+    echo "<script>alert('Profile updated successfully!');</script>";
+}
+
+$conn->close();
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="user-profile.css"> <!-- Adjust the path if necessary -->
+    <title>User Profile - Agrishop</title>
+</head>
+<body>
+    <div class="container">
+        <h1>User Profile</h1>
+        <form method="POST" action="">
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" value="<?php echo htmlspecialchars($name); ?>" required>
+            <button type="submit">Update Profile</button>
+        </form>
+        
+        <h2>Account Details</h2>
+        <p><strong>Email:</strong> <?php echo htmlspecialchars($email); ?></p>
+        <p><strong>Role:</strong> <?php echo htmlspecialchars($role); ?></p>
+        
+        <a href="dashboard.php" class="button">Back to Dashboard</a>
+    </div>
+</body>
+</html>
